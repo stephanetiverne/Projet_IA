@@ -1,10 +1,28 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
 .venv/
 venv/
+env/
+
+# IDEs
 .vscode/
+.idea/
+
+# OS files
 .DS_Store
+
+# Data & models (heavy files)
+data/*.csv
 models/*.pkl
 *.pickle
+*.png
+
+# Environment variables
 .env
