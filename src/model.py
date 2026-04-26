@@ -1,11 +1,14 @@
+import sys
+import os
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import joblib
-import pandas as pd
-import os
+
+# Pour importer preprocess
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from preprocess import preprocess_data
 
 def get_models():
     """
@@ -38,29 +41,32 @@ def save_best_model(model, name):
     os.makedirs(models_dir, exist_ok=True)
     filename = os.path.join(models_dir, f'{name}_model.pkl')
     joblib.dump(model, filename)
-    print(f"Modèle {name} sauvegardé !")
+    print(f"Modèle {name} sauvegardé à {filename}")
 
 if __name__ == "__main__":
-    # Charger les données
-    data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'sonar.all-data.csv')
-    data = pd.read_csv(data_path, header=None)
-    X = data.iloc[:, :-1]
-    y = data.iloc[:, -1]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Charger et prétraiter les données depuis preprocess.py
+    print("Chargement et prétraitement des données...")
+    X_train, X_test, y_train, y_test = preprocess_data()
+    print(f"Données préchargées - Train: {X_train.shape}, Test: {X_test.shape}")
     
     # Entraîner les modèles
+    print("\nEntraînement des modèles...")
     trained_models = train_all_models(X_train, y_train)
     
     # Évaluer et sauvegarder le meilleur
+    print("\nÉvaluation des modèles...")
     best_model = None
     best_score = 0
     for name, model in trained_models.items():
         y_pred = model.predict(X_test)
         score = accuracy_score(y_test, y_pred)
-        print(f"{name} Accuracy: {score}")
+        print(f"{name} Accuracy: {score:.4f}")
         if score > best_score:
             best_score = score
             best_model = (model, name)
     
     if best_model:
+        print(f"\nMeilleur modèle: {best_model[1]} avec une accuracy de {best_score:.4f}")
         save_best_model(best_model[0], best_model[1])
+    else:
+        print("Erreur: Aucun modèle n'a pu être créé.")

@@ -1,4 +1,10 @@
 __pycache__/
+*.py[cod]
+*$py.class
+.venv/
 venv/
 .vscode/
-*.pyc
+.DS_Store
+models/*.pkl
+*.pickle
+.env
